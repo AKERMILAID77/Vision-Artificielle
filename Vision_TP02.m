@@ -1,30 +1,31 @@
-%clear all
-%pack load image
+clear all
 clc
 
 imA = imread('eight.tif');
+
 %imB = imnoise(imA,'salt & pepper', 0.02);
+%imB = imnoise(imA,'gaussian',0.02);
+%imB = imnoise(imA,'poisson');
 
 N = fix(242*308*0.02); %nombre des grains
 imB=imA;
-
-%im=[];
 for i=1:N
  x=fix(242*rand)+1;
  y=fix(308*rand)+1;
  imB(x,y)=fix(2*rand)*255;
- %im=[im, imB(x,y)];
 end
-%im
+
 
 figure(1)
-subplot(121)
+subplot(231)
 imshow(imA)
 title('Image originale')
 
-subplot(122)
+subplot(232)
 imshow(imB)
-title('Image bruitée')
+title('Image bruitee (salt & papper)')
+%title('Image bruitee (gaussian)')
+%title('Image bruitee (poisson)')
 
 fMoy=1/25*ones(5,5);
 imMoy=uint8(conv2(imB,fMoy));
@@ -48,37 +49,40 @@ imExp=uint8(conv2(imB,fExp));
 imC=medfilt2(imB);
 
 %%
+subplot(233)
+imshow(imMoy)
+title('Image filtree Moy')
+
+%%
+subplot(234)
+imshow(imGau)
+title('Image filtree gaussien')
+
+%%
+subplot(235)
+imshow(imExp)
+title('Image filtree exponentiel')
+
+%%
+subplot(236)
+imshow(imC)
+title('Image filtree median')
+
+%%
+%my filter
+imD=imB;
+for x=3:240
+    for y=3:306
+        if (imB(x,y)==0) | (imB(x,y)==255);
+            myMat=imB(x-2:x+2,y-2:y+2);
+            imD(x,y)=uint8(sum(sum(myMat))/25);
+        end        
+    end
+end
+
 figure(2)
 subplot(121)
 imshow(imB)
-title('Image bruitée')
-subplot(122)
-imshow(imMoy)
-title('Image filtrée Moy')
 
-%%
-figure(3)
-subplot(121)
-imshow(imB)
-title('Image bruitée')
 subplot(122)
-imshow(imGau)
-title('Image filtrée gaussien')
-
-%%
-figure(4)
-subplot(121)
-imshow(imB)
-title('Image bruitée')
-subplot(122)
-imshow(imExp)
-title('Image filtrée exponentiel')
-
-%%
-figure(5)
-subplot(121)
-imshow(imB)
-title('Image bruitée')
-subplot(122)
-imshow(imC)
-title('Image filtrée median')
+imshow(imD)
